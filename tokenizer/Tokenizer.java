@@ -28,6 +28,27 @@ public class Tokenizer {
                 String num = readNumber();
                 tokens.add(new Token(TokenType.NUMBER, num, line));
             }
+
+            else if (Character.isLetter(c)) {
+                String word = readWord();
+
+                if (word.equals("is")) {
+                    skipWhitespace();
+
+                    String next1 = readWord(); // greater
+                    skipWhitespace();
+
+                    String next2 = readWord(); // than
+
+                    if (next1.equals("greater") && next2.equals("than")) {
+                        tokens.add(new Token(TokenType.GREATER_THAN, ">", line));
+                    } else {
+                        throw new RuntimeException("Invalid comparison syntax");
+                    }
+                } else {
+                    tokens.add(new Token(getKeyword(word), word, line));
+                }
+            }
         }
     }
 
@@ -40,4 +61,33 @@ public class Tokenizer {
         }
 
         return sb.toString();
+    }
+
+    private String readWord() {
+        StringBuilder sb = new StringBuilder();
+
+        while (pos < source.length() && Character.isLetter(source.charAt(pos))) {
+            sb.append(source.charAt(pos++));
+        }
+
+        return sb.toString();
+    }
+
+    private void skipWhitespace() {
+        while (pos < source.length() && Character.isWhitespace(source.charAt(pos))) {
+            pos++;
+        }
+    }
+
+    private TokenType getKeyword(String word) {
+        switch (word) {
+            case "let": return TokenType.LET;
+            case "be": return TokenType.BE;
+            case "say": return TokenType.SAY;
+            case "if": return TokenType.IF;
+            case "then": return TokenType.THEN;
+            case "repeat": return TokenType.REPEAT;
+            case "times": return TokenType.TIMES;
+            default: return TokenType.IDENTIFIER;
+        }
     }
