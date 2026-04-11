@@ -49,9 +49,46 @@ public class Tokenizer {
                     tokens.add(new Token(getKeyword(word), word, line));
                 }
             }
+
+            else if (c == '"') {
+                String str = readString();
+                tokens.add(new Token(TokenType.STRING, str, line));
+            }
+
+            else if (c == '+') {
+                tokens.add(new Token(TokenType.PLUS, "+", line));
+                pos++;
+            }
+
+            else if (c == '-') {
+                tokens.add(new Token(TokenType.MINUS, "-", line));
+                pos++;
+            }
+
+            else if (c == '*') {
+                tokens.add(new Token(TokenType.MULTIPLY, "*", line));
+                pos++;
+            }
+
+            else if (c == '/') {
+                tokens.add(new Token(TokenType.DIVIDE, "/", line));
+                pos++;
+            }
+
+            else if (c == '>') {
+                tokens.add(new Token(TokenType.GREATER_THAN, ">", line));
+                pos++;
+            }
+
+            else {
+                throw new RuntimeException("Unexpected char: " + c);
+            }
+        }
+
+        tokens.add(new Token(TokenType.EOF, "", line));
+        return tokens;
         }
     }
-
 
     private String readNumber() {
         StringBuilder sb = new StringBuilder();
@@ -70,6 +107,19 @@ public class Tokenizer {
             sb.append(source.charAt(pos++));
         }
 
+        return sb.toString();
+    }
+
+    private String readString() {
+        pos++;
+
+        StringBuilder sb = new StringBuilder();
+
+        while (source.charAt(pos) != '"') {
+            sb.append(source.charAt(pos++));
+        }
+
+        pos++;
         return sb.toString();
     }
 
