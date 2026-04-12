@@ -1,5 +1,4 @@
 package tokenizer;
-
 import java.util.*;
 
 public class Tokenizer {
@@ -87,7 +86,6 @@ public class Tokenizer {
 
         tokens.add(new Token(TokenType.EOF, "", line));
         return tokens;
-        }
     }
 
     private String readNumber() {
@@ -141,3 +139,4 @@ public class Tokenizer {
             default: return TokenType.IDENTIFIER;
         }
     }
+}

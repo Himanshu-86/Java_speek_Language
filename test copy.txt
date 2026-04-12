@@ -1,0 +1,25 @@
+let x be 10
+let y be 5
+
+say "Initial values:"
+say x
+say y
+
+let sum be x + y
+let product be x * y
+
+say "Sum:"
+say sum
+
+say "Product:"
+say product
+
+if x is greater than y then
+say "x is greater than y"
+
+repeat 3 times
+say "Loop running"
+
+let result be x + y * 2
+say "Final result:"
+say result
