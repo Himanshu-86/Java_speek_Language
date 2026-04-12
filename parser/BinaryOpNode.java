@@ -17,13 +17,13 @@ public class BinaryOpNode implements Expression {
         double l = (double) left.evaluate(env);
         double r = (double) right.evaluate(env);
 
-        return switch (op) {
-            case "+" -> l + r;
-            case "-" -> l - r;
-            case "*" -> l * r;
-            case "/" -> l / r;
-            case ">" -> l > r;
-            default -> throw new RuntimeException("Unknown op");
-        };
+        switch (op) {
+            case "+": return l + r;
+            case "-": return l - r;
+            case "*": return l * r;
+            case "/": return l / r;
+            case ">": return l > r;
+            default: throw new RuntimeException("Unknown op");
+        }
     }
 }
