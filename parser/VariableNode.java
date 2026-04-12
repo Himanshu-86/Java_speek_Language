@@ -9,6 +9,7 @@ public class VariableNode implements Expression {
         this.name = name;
     }
 
+    @Override
     public Object evaluate(Environment env) {
         return env.get(name);
     }
