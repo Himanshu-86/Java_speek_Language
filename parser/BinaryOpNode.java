@@ -12,17 +12,18 @@ public class BinaryOpNode implements Expression {
         this.right = right;
     }
 
+    @Override
     public Object evaluate(Environment env) {
         double l = (double) left.evaluate(env);
         double r = (double) right.evaluate(env);
 
-        switch (op) {
-            case "+": return l + r;
-            case "-": return l - r;
-            case "*": return l * r;
-            case "/": return l / r;
-            case ">": return l > r;
-            default: throw new RuntimeException("Unknown op");
-        }
+        return switch (op) {
+            case "+" -> l + r;
+            case "-" -> l - r;
+            case "*" -> l * r;
+            case "/" -> l / r;
+            case ">" -> l > r;
+            default -> throw new RuntimeException("Unknown op");
+        };
     }
 }
