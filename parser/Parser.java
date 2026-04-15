@@ -73,7 +73,7 @@ public class Parser {
         return instructions;
     }
 
-    // 🔹 ASSIGN: let <varName> be <expression>
+    //  ASSIGN: let <varName> be <expression>
     private Instruction parseAssign() {
         consume(); // consume LET
 
@@ -98,7 +98,7 @@ public class Parser {
         return new PrintInstruction(expr);
     }
 
-    // 🔹 IF: if <expr> > <expr> then <single-line body>
+    //  IF: if <expr> > <expr> then <single-line body>
     private Instruction parseIf() {
         consume(); // consume IF
 
@@ -138,7 +138,7 @@ public class Parser {
         return new IfInstruction(condition, body);
     }
 
-    // 🔹 REPEAT: repeat <countExpr> times <single-line body>
+    //  REPEAT: repeat <countExpr> times <single-line body>
     private Instruction parseRepeat() {
         consume(); // consume REPEAT
 
@@ -168,7 +168,7 @@ public class Parser {
         return new RepeatInstruction(count, body);
     }
 
-    // 🔹 EXPRESSIONS (handles + and - precedence level)
+    //  EXPRESSIONS (handles + and - precedence level)
     private Expression parseExpression() {
         Expression left = parseTerm();
 
@@ -185,7 +185,7 @@ public class Parser {
         return left;
     }
 
-    // 🔹 TERMS (handles * and / precedence)
+    //  TERMS (handles * and / precedence)
     private Expression parseTerm() {
         Expression left = parseFactor();
 
@@ -202,7 +202,7 @@ public class Parser {
         return left;
     }
 
-    // 🔹 FACTORS (basic units: number, string, variable)
+    //  FACTORS (basic units: number, string, variable)
     private Expression parseFactor() {
         Token token = consume();
 
