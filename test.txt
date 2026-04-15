@@ -15,7 +15,9 @@ say "Product:"
 say product
 
 if x is greater than y then
-say "x is greater than y"
+say x
+say " is greater than "
+say y
 
 repeat 3 times
 say "Loop running"
