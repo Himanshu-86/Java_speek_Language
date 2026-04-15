@@ -1,5 +1,6 @@
 /**
- * Parser for the Speek language. Transforms a list of tokens into a list of instructions.
+ * Parser for the Speek language.
+ * Converts a list of tokens into executable instructions (AST level).
  */
 package parser;
 
@@ -9,21 +10,24 @@ import tokenizer.*;
 
 public class Parser {
 
-    private final List<Token> tokens;
-    private int pos = 0;
+    private final List<Token> tokens;  // list of tokens from tokenizer
+    private int pos = 0;              // current position in token list
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
 
+    // Returns current token without consuming it
     private Token current() {
         return tokens.get(pos);
     }
 
+    // Consumes current token and moves to next
     private Token consume() {
         return tokens.get(pos++);
     }
 
+    // Matches expected token type and consumes it if matched
     private boolean match(TokenType type) {
         if (current().getType() == type) {
             pos++;
@@ -32,11 +36,13 @@ public class Parser {
         return false;
     }
 
+    // Main parsing loop: converts tokens → list of instructions
     public List<Instruction> parse() {
         List<Instruction> instructions = new ArrayList<>();
 
         while (current().getType() != TokenType.EOF) {
-            // Determine the instruction type based on the starting keyword
+
+            // Decide which instruction to parse based on keyword
             if (current().getType() == TokenType.LET) {
                 instructions.add(parseAssign());
             }
@@ -53,10 +59,12 @@ public class Parser {
                 instructions.add(parseRepeat());
             }
 
+            // Skip empty lines
             else if (current().getType() == TokenType.NEWLINE) {
-                consume(); // skip empty lines
+                consume();
             }
 
+            // Unknown structure → syntax error
             else {
                 throw new RuntimeException("Unexpected token: " + current().getValue());
             }
@@ -65,58 +73,60 @@ public class Parser {
         return instructions;
     }
 
-    // ASSIGN: let <varName> be <expression>
+    // 🔹 ASSIGN: let <varName> be <expression>
     private Instruction parseAssign() {
-        consume(); // LET
+        consume(); // consume LET
 
-        String varName = consume().getValue(); // IDENTIFIER
+        String varName = consume().getValue(); // variable name
 
+        // Ensure 'be' keyword exists
         if (!match(TokenType.BE)) {
             throw new RuntimeException("Expected 'be'");
         }
 
-        Expression expr = parseExpression();
+        Expression expr = parseExpression(); // parse right-hand side
 
         return new AssignInstruction(varName, expr);
     }
 
-    // PRINT: say <expression>
+    // 🔹 PRINT: say <expression>
     private Instruction parsePrint() {
-        consume(); // SAY
+        consume(); // consume SAY
 
-        Expression expr = parseExpression();
+        Expression expr = parseExpression(); // expression to print
 
         return new PrintInstruction(expr);
     }
 
-    // IF: if <expr> is greater than <expr> then <bodyLine>
+    // 🔹 IF: if <expr> > <expr> then <single-line body>
     private Instruction parseIf() {
-        consume(); // IF
+        consume(); // consume IF
 
         Expression left = parseExpression();
 
+        // Expect 'is greater than' → already tokenized as GREATER_THAN
         if (!match(TokenType.GREATER_THAN)) {
             throw new RuntimeException("Expected 'is greater than'");
         }
 
         Expression right = parseExpression();
 
+        // Build condition expression
         Expression condition = new BinaryOpNode(left, ">", right);
 
+        // Expect THEN keyword
         if (!match(TokenType.THEN)) {
             throw new RuntimeException("Expected 'then'");
         }
 
         List<Instruction> body = new ArrayList<>();
 
-        // skip newline
-
+        // Skip newline if present
         if (current().getType() == TokenType.NEWLINE) {
             consume();
         }
 
-        // single-line body
-
+        // Only single-line body supported
         if (current().getType() == TokenType.SAY) {
             body.add(parsePrint());
         } else if (current().getType() == TokenType.LET) {
@@ -128,26 +138,25 @@ public class Parser {
         return new IfInstruction(condition, body);
     }
 
-    // REPEAT: repeat <countExpr> times <bodyLine>
+    // 🔹 REPEAT: repeat <countExpr> times <single-line body>
     private Instruction parseRepeat() {
-        consume(); // REPEAT
+        consume(); // consume REPEAT
 
-        Expression count = parseExpression();
+        Expression count = parseExpression(); // loop count
 
+        // Expect TIMES keyword
         if (!match(TokenType.TIMES)) {
             throw new RuntimeException("Expected 'times'");
         }
 
         List<Instruction> body = new ArrayList<>();
 
-        // skip newline
-
+        // Skip newline if present
         if (current().getType() == TokenType.NEWLINE) {
             consume();
         }
 
-        // single-line body
-
+        // Only single-line body supported
         if (current().getType() == TokenType.SAY) {
             body.add(parsePrint());
         } else if (current().getType() == TokenType.LET) {
@@ -159,12 +168,11 @@ public class Parser {
         return new RepeatInstruction(count, body);
     }
 
-    // EXPRESSIONS
-
-    // EXPRESSIONS: Entry point for parsing expressions with +/- precedence
+    // 🔹 EXPRESSIONS (handles + and - precedence level)
     private Expression parseExpression() {
         Expression left = parseTerm();
 
+        // Continue while + or - operators are found
         while (current().getType() == TokenType.PLUS ||
                 current().getType() == TokenType.MINUS) {
 
@@ -177,10 +185,11 @@ public class Parser {
         return left;
     }
 
-    // TERMS: Handling * and / precedence
+    // 🔹 TERMS (handles * and / precedence)
     private Expression parseTerm() {
         Expression left = parseFactor();
 
+        // Continue while * or / operators are found
         while (current().getType() == TokenType.MULTIPLY ||
                 current().getType() == TokenType.DIVIDE) {
 
@@ -193,7 +202,7 @@ public class Parser {
         return left;
     }
 
-    // FACTORS: Lowest level elements (numbers, variables, strings)
+    // 🔹 FACTORS (basic units: number, string, variable)
     private Expression parseFactor() {
         Token token = consume();
 
@@ -209,6 +218,7 @@ public class Parser {
                 return new VariableNode(token.getValue());
 
             default:
+                // Invalid expression element
                 throw new RuntimeException("Unexpected token in expression: " + token.getValue());
         }
     }
